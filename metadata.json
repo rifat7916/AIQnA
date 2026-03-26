@@ -1,0 +1,5 @@
+{
+  "name": "AIQnA",
+  "description": "Generate high-quality educational assessments based on the NCTB (Bangladesh) curriculum for various classes and subjects.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-bengali: "Hind Siliguri", "Plus Jakarta Sans", sans-serif;
+  
+  --animate-fade-in-up: fade-in-up 0.6s ease-out forwards;
+  --animate-shimmer: shimmer 2s infinite linear;
+  
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  --animate-blob: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.markdown-body {
+  @apply leading-relaxed font-bengali;
+}
+
+.markdown-body h1 {
+  @apply text-2xl font-bold mb-4 mt-6 border-b pb-2;
+}
+
+.markdown-body h2 {
+  @apply text-xl font-semibold mb-3 mt-5;
+}
+
+.markdown-body p {
+  @apply mb-4 leading-relaxed whitespace-pre-wrap;
+}
+
+.markdown-body ul {
+  @apply list-disc pl-6 mb-4;
+}
+
+.markdown-body ol {
+  @apply list-decimal pl-6 mb-4;
+}
+
+.markdown-body li {
+  @apply mb-1 leading-relaxed;
+}
+
+.markdown-body blockquote {
+  @apply border-l-4 border-indigo-500 pl-4 italic my-4 text-slate-600 bg-indigo-50/50 py-2 rounded-r-lg;
+}
+
+.markdown-body table {
+  @apply w-full mb-4 border-collapse;
+}
+
+.markdown-body th, .markdown-body td {
+  @apply p-2 text-left align-top border border-slate-200 dark:border-slate-700;
+}
+
+.markdown-body th {
+  @apply font-semibold bg-slate-50 dark:bg-slate-800/50;
+}
+
+/* For empty table headers (often used for MCQ options) */
+.markdown-body th:empty {
+  @apply hidden;
+}
+
+.markdown-body table.mcq-options {
+  @apply w-full mb-4 border-none;
+}
+
+.markdown-body table.mcq-options td {
+  @apply w-1/2 p-2 text-left align-top border-none;
+}
+
+/* Ensure Bengali characters in KaTeX math render properly with Hind Siliguri */
+.katex {
+  font-family: KaTeX_Main, "Hind Siliguri", "Times New Roman", serif !important;
+}
+
+.shimmer-bg {
+  background: linear-gradient(to right, #f1f5f9 4%, #e2e8f0 25%, #f1f5f9 36%);
+  background-size: 1000px 100%;
+}

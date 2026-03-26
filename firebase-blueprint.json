@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Represents a user in the system.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's display name or username."
+        },
+        "photoURL": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL to the user's profile photo."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user"],
+          "description": "The user's role."
+        },
+        "generation_count": {
+          "type": "number",
+          "description": "The number of questions the user has generated."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the user was created."
+        },
+        "is_blocked": {
+          "type": "boolean",
+          "description": "Whether the user is blocked from generating questions."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        }
+      },
+      "required": ["email", "username", "role", "generation_count", "createdAt"]
+    },
+    "Document": {
+      "title": "Document",
+      "description": "Represents a generated question paper.",
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "The ID of the user who generated the document."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the document."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the document (HTML)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the document was created."
+        }
+      },
+      "required": ["user_id", "title", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Stores user profiles."
+    },
+    "/documents/{docId}": {
+      "schema": {
+        "$ref": "#/entities/Document"
+      },
+      "description": "Stores generated question papers."
+    }
+  }
+}

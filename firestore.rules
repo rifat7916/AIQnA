@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() &&
+        (
+          (request.auth.token.email == "raifathai17@gmail.com" && request.auth.token.email_verified == true) ||
+          (request.auth.token.email == "rifat@aiqna.app") ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+        );
+    }
+    
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'username', 'role', 'generation_count', 'createdAt']) &&
+             data.keys().hasOnly(['email', 'username', 'photoURL', 'role', 'generation_count', 'createdAt', 'is_blocked', 'displayName']) &&
+             data.email is string &&
+             data.username is string &&
+             (!('photoURL' in data) || data.photoURL is string || data.photoURL == null) &&
+             data.role in ['admin', 'user'] &&
+             data.generation_count is number &&
+             data.createdAt is string &&
+             (!('is_blocked' in data) || data.is_blocked is bool) &&
+             (!('displayName' in data) || data.displayName is string);
+    }
+    
+    function isValidDocument(data) {
+      return data.keys().hasAll(['user_id', 'title', 'content', 'createdAt']) &&
+             data.keys().hasOnly(['user_id', 'title', 'content', 'createdAt']) &&
+             data.user_id is string &&
+             data.title is string &&
+             data.content is string &&
+             data.createdAt is string;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      // Users can read their own profile, admins can read all profiles
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can create their own profile (default role 'user')
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
+      
+      // Users can update their own generation_count, admins can update anything
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    ((isOwner(userId) && request.resource.data.role == resource.data.role && (!('is_blocked' in request.resource.data) || request.resource.data.is_blocked == resource.data.is_blocked)) || isAdmin());
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Documents Collection
+    match /documents/{docId} {
+      // Users can read their own documents, admins can read all documents
+      allow read: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      
+      // Users can create documents for themselves
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidDocument(request.resource.data);
+      
+      // Users can update their own documents, admins can update all
+      allow update: if (isAuthenticated() && resource.data.user_id == request.auth.uid && request.resource.data.user_id == request.auth.uid && isValidDocument(request.resource.data)) || isAdmin();
+      
+      // Users can delete their own documents, admins can delete all
+      allow delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+    }
+  }
+}
